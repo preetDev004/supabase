@@ -113,7 +113,7 @@ const Usage = () => {
   return (
     <>
       <ScaffoldContainer className="sticky top-0 border-b bg-studio z-10 overflow-hidden">
-        <div className="py-4 flex items-center space-x-4">
+        <div className="py-4 flex flex-col md:flex-row md:items-center gap-4">
           {isLoadingSubscription && <ShimmeringLoader className="w-[250px]" />}
 
           {isErrorSubscription && (
@@ -138,7 +138,7 @@ const Usage = () => {
               <Listbox
                 size="tiny"
                 name="schema"
-                className="w-[180px]"
+                className="w-full md:w-[180px]"
                 value={selectedProjectRef}
                 onChange={(value: any) => {
                   if (value === 'all-projects') setSelectedProjectRef(undefined)
@@ -184,10 +184,7 @@ const Usage = () => {
           <Admonition
             type="default"
             title="Usage filtered by project"
-            description={`You are currently viewing usage for the "
-                  ${selectedProject?.name || selectedProjectRef}" project. Since your organization is
-                  using the new organization-based billing, the included quota is for your whole
-                  organization and not just this project. For billing purposes, we sum up usage from
+            description={`You are currently viewing usage for the "${selectedProject?.name || selectedProjectRef}" project. Supabase uses organization-level billing and quotas. For billing purposes, we sum up usage from
                   all your projects. To view your usage quota, set the project filter above back to
                   "All Projects".`}
           >
