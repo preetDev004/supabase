@@ -11,9 +11,12 @@ concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     steps:
       - uses: actions/checkout@v4
@@ -25,7 +28,6 @@ jobs:
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
-          version: 9.10.0
           run_install: false
 
       - name: Use Node.js

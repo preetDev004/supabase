@@ -9,7 +9,7 @@ import { databaseKeys } from 'data/database/keys'
 
 export type DatabaseQueueExposePostgrestVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   enable: boolean
 }
 
@@ -82,26 +82,6 @@ end;
 $$;
 
 comment on function ${QUEUES_SCHEMA}.send_batch(queue_name text, messages jsonb[], sleep_seconds integer) is 'Sends a batch of messages to the specified queue, optionally delaying their availability by a number of seconds.';
-
-
-create or replace function ${QUEUES_SCHEMA}.archive(
-    queue_name text,
-    message_id bigint
-)
-  returns boolean
-  language plpgsql
-  set search_path = ''
-as $$
-begin
-    return
-    pgmq.archive(
-        queue_name := queue_name,
-        msg_id := message_id
-    );
-end;
-$$;
-
-comment on function ${QUEUES_SCHEMA}.archive(queue_name text, message_id bigint) is 'Archives a message by moving it from the queue to a permanent archive.';
 
 
 create or replace function ${QUEUES_SCHEMA}.archive(

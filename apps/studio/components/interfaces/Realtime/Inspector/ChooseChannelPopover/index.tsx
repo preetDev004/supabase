@@ -1,10 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ChevronDown, ExternalLink } from 'lucide-react'
+import { IS_PLATFORM, useParams } from 'common'
+import { ChevronDown } from 'lucide-react'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
+import { DocsButton } from 'components/ui/DocsButton'
+import { getTemporaryAPIKey } from 'data/api-keys/temp-api-keys-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   FormControl_Shadcn_,
@@ -20,8 +25,6 @@ import {
   Switch,
 } from 'ui'
 import { RealtimeConfig } from '../useRealtimeMessages'
-import { DocsButton } from 'components/ui/DocsButton'
-import { TelemetryActions } from 'lib/constants/telemetry'
 
 interface ChooseChannelPopoverProps {
   config: RealtimeConfig
@@ -32,7 +35,8 @@ const FormSchema = z.object({ channel: z.string(), isPrivate: z.boolean() })
 
 export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPopoverProps) => {
   const [open, setOpen] = useState(false)
-
+  const { ref } = useParams()
+  const { data: org } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -50,11 +54,26 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
     setOpen(v)
   }
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     setOpen(false)
-    sendEvent({ action: TelemetryActions.REALTIME_INSPECTOR_LISTEN_CHANNEL_CLICKED })
+    sendEvent({
+      action: 'realtime_inspector_listen_channel_clicked',
+      groups: {
+        project: ref ?? 'Unknown',
+        organization: org?.slug ?? 'Unknown',
+      },
+    })
+
+    let token = config.token
+
+    // [Joshen] Refresh if starting to listen + using temp API key, since it has a low refresh rate
+    if (token.startsWith('sb_temp') || !IS_PLATFORM) {
+      const data = await getTemporaryAPIKey({ projectRef: config.projectRef, expiry: 3600 })
+      token = data.api_key
+    }
     onChangeConfig({
       ...config,
+      token,
       channelName: form.getValues('channel'),
       isChannelPrivate: form.getValues('isPrivate'),
       enabled: true,
@@ -73,7 +92,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
           </p>
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-[320px]" align="start">
+      <PopoverContent_Shadcn_ portal className="p-0 w-[320px]" align="start">
         <div className="p-4 flex flex-col text-sm">
           {config.channelName.length === 0 ? (
             <>
@@ -117,7 +136,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                             target="_blank"
                             rel="noreferrer"
                             className="underline hover:text-foreground transition"
-                            href="https://supabase.com/docs/guides/realtime/concepts#channels"
+                            href={`${DOCS_URL}/guides/realtime/concepts#channels`}
                           >
                             our docs
                           </a>
@@ -155,7 +174,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                   <DocsButton
                     abbrev={false}
                     className="w-min"
-                    href="https://supabase.com/docs/guides/realtime/authorization"
+                    href={`${DOCS_URL}/guides/realtime/authorization`}
                   />
                 </form>
               </Form_Shadcn_>

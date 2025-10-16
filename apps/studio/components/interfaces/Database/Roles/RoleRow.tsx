@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
+  cn,
   Collapsible,
   DropdownMenu,
   DropdownMenuContent,
@@ -9,14 +10,14 @@ import {
   DropdownMenuTrigger,
   Form,
   Toggle,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseRoleUpdateMutation } from 'data/database-roles/database-role-update-mutation'
 import { PgRole } from 'data/database-roles/database-roles-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { ChevronUp, HelpCircle, MoreVertical, Trash } from 'lucide-react'
 import { ROLE_PERMISSIONS } from './Roles.constants'
 
@@ -26,8 +27,8 @@ interface RoleRowProps {
   onSelectDelete: (role: PgRole) => void
 }
 
-const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
-  const { project } = useProjectContext()
+export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
+  const { data: project } = useSelectedProjectQuery()
   const [isExpanded, setIsExpanded] = useState(false)
 
   const { mutate: updateDatabaseRole, isLoading: isUpdating } = useDatabaseRoleUpdateMutation()
@@ -70,7 +71,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
         canBypassRls,
       }}
       onSubmit={onSaveChanges}
-      className={[
+      className={cn(
         'bg-surface-100',
         'hover:bg-overlay-hover',
         'data-open:bg-selection',
@@ -80,8 +81,8 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
         '-space-y-px overflow-hidden',
         'border border-t-0 first:border-t first:!mt-0 hover:border-t hover:-mt-[1px] shadow transition hover:z-50',
         'first:rounded-tl first:rounded-tr',
-        'last:rounded-bl last:rounded-br',
-      ].join(' ')}
+        'last:rounded-bl last:rounded-br'
+      )}
     >
       {({ values, initialValues, handleReset }: any) => {
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
@@ -133,9 +134,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                   {!disabled && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button type="default" className="px-1">
-                          <MoreVertical />
-                        </Button>
+                        <Button type="default" className="px-1" icon={<MoreVertical />} />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent side="bottom" className="w-[120px]">
                         <DropdownMenuItem
@@ -175,18 +174,18 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                         afterLabel={
                           !disabled &&
                           ROLE_PERMISSIONS[permission].disabled && (
-                            <Tooltip_Shadcn_>
-                              <TooltipTrigger_Shadcn_>
+                            <Tooltip>
+                              <TooltipTrigger>
                                 <HelpCircle
                                   size="14"
                                   strokeWidth={2}
                                   className="ml-2 relative top-[3px]"
                                 />
-                              </TooltipTrigger_Shadcn_>
-                              <TooltipContent_Shadcn_ side="bottom">
+                              </TooltipTrigger>
+                              <TooltipContent side="bottom">
                                 This privilege cannot be updated via the dashboard
-                              </TooltipContent_Shadcn_>
-                            </Tooltip_Shadcn_>
+                              </TooltipContent>
+                            </Tooltip>
                           )
                         }
                       />
@@ -220,5 +219,3 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
     </Form>
   )
 }
-
-export default RoleRow

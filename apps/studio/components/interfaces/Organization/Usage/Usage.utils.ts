@@ -1,4 +1,8 @@
+import dayjs from 'dayjs'
+import { groupBy } from 'lodash'
+
 import { DataPoint } from 'data/analytics/constants'
+import type { OrgDailyUsageResponse, PricingMetric } from 'data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from 'data/subscriptions/types'
 
 // [Joshen] This is just for development to generate some test data for chart rendering
@@ -13,14 +17,14 @@ export const generateUsageData = (attribute: string, days: number): DataPoint[] 
   })
 }
 
-export const getUpgradeUrl = (slug: string, subscription?: OrgSubscription) => {
+export const getUpgradeUrl = (slug: string, subscription?: OrgSubscription, source?: string) => {
   if (!subscription) {
     return `/org/${slug}/billing`
   }
 
   return subscription?.plan?.id === 'pro' && subscription?.usage_billing_enabled === false
     ? `/org/${slug}/billing#cost-control`
-    : `/org/${slug}/billing?panel=subscriptionPlan`
+    : `/org/${slug}/billing?panel=subscriptionPlan&source=usage${source}`
 }
 
 const compactNumberFormatter = new Intl.NumberFormat('en-US', {
@@ -91,4 +95,39 @@ const formatBytesPrecision = (bytes: any) => {
   const unit = sizes[i]
 
   return parseFloat((bytes / Math.pow(k, i)).toFixed(3)) + ' ' + unit
+}
+
+export function dailyUsageToDataPoints(
+  dailyUsage: OrgDailyUsageResponse | undefined,
+  includeMetric: (metric: PricingMetric) => boolean
+): DataPoint[] {
+  if (!dailyUsage || !dailyUsage.usages.length) return []
+
+  const groupedByDate = groupBy(
+    dailyUsage.usages.filter((it) => includeMetric(it.metric as PricingMetric)),
+    'date'
+  )
+
+  const dataPoints: DataPoint[] = []
+
+  Object.entries(groupedByDate).forEach(([date, usages]) => {
+    const dataPoint: DataPoint = {
+      period_start: date,
+      periodStartFormatted: dayjs(date).format('DD MMM'),
+    }
+
+    for (const usage of usages) {
+      dataPoint[usage.metric.toLowerCase()] = usage.usage_original
+
+      if (usage.breakdown) {
+        for (const [key, value] of Object.entries(usage.breakdown)) {
+          dataPoint[key.toLowerCase()] = value
+        }
+      }
+    }
+
+    dataPoints.push(dataPoint)
+  })
+
+  return dataPoints
 }

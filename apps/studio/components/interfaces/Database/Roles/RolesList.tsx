@@ -3,38 +3,34 @@ import { partition, sortBy } from 'lodash'
 import { Plus, Search, X } from 'lucide-react'
 import { useState } from 'react'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import SparkBar from 'components/ui/SparkBar'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import {
-  Badge,
-  Button,
-  Input,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-} from 'ui'
-import CreateRolePanel from './CreateRolePanel'
-import DeleteRoleModal from './DeleteRoleModal'
-import RoleRow from './RoleRow'
-import RoleRowSkeleton from './RoleRowSkeleton'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Badge, Button, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { CreateRolePanel } from './CreateRolePanel'
+import { DeleteRoleModal } from './DeleteRoleModal'
+import { RoleRow } from './RoleRow'
+import { RoleRowSkeleton } from './RoleRowSkeleton'
 import { SUPABASE_ROLES } from './Roles.constants'
 
 type SUPABASE_ROLE = (typeof SUPABASE_ROLES)[number]
 
 const RolesList = () => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const [filterString, setFilterString] = useState('')
   const [filterType, setFilterType] = useState<'all' | 'active'>('all')
   const [isCreatingRole, setIsCreatingRole] = useState(false)
   const [selectedRoleToDelete, setSelectedRoleToDelete] = useState<any>()
 
-  const canUpdateRoles = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'roles')
+  const { can: canUpdateRoles } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'roles'
+  )
 
   const { data: maxConnData } = useMaxConnectionsQuery({
     projectRef: project?.ref,
@@ -115,8 +111,8 @@ const RolesList = () => {
           </div>
         </div>
         <div className="flex items-center space-x-6">
-          <Tooltip_Shadcn_>
-            <TooltipTrigger_Shadcn_>
+          <Tooltip>
+            <TooltipTrigger>
               <div className="w-42">
                 <SparkBar
                   type="horizontal"
@@ -143,16 +139,16 @@ const RolesList = () => {
                   labelBottomClass="text-xs"
                 />
               </div>
-            </TooltipTrigger_Shadcn_>
-            <TooltipContent_Shadcn_ align="start" side="bottom" className="space-y-1">
+            </TooltipTrigger>
+            <TooltipContent align="start" side="bottom" className="space-y-1">
               <p className="text-foreground-light pr-2">Connections by roles:</p>
               {rolesWithActiveConnections.map((role) => (
                 <div key={role.id}>
                   {role.name}: {role.activeConnections}
                 </div>
               ))}
-            </TooltipContent_Shadcn_>
-          </Tooltip_Shadcn_>
+            </TooltipContent>
+          </Tooltip>
           <ButtonTooltip
             type="primary"
             disabled={!canUpdateRoles}

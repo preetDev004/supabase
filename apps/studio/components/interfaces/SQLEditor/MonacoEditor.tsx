@@ -1,15 +1,15 @@
 import Editor, { Monaco, OnMount } from '@monaco-editor/react'
-import { debounce } from 'lodash'
 import { useRouter } from 'next/router'
-import { MutableRefObject, useEffect, useRef } from 'react'
+import { MutableRefObject, useEffect, useRef, useState } from 'react'
 
-import { useParams } from 'common'
+import { useDebounce } from '@uidotdev/usehooks'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { useTabsStateSnapshot } from 'state/tabs'
 import { cn } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { untitledSnippetTitle } from './SQLEditor.constants'
@@ -24,6 +24,7 @@ export type MonacoEditorProps = {
   autoFocus?: boolean
   executeQuery: () => void
   onHasSelection: (value: boolean) => void
+  onMount?: (editor: IStandaloneCodeEditor) => void
   onPrompt?: (value: {
     selection: string
     beforeSelection: string
@@ -31,6 +32,7 @@ export type MonacoEditorProps = {
     startLineNumber: number
     endLineNumber: number
   }) => void
+  placeholder?: string
 }
 
 const MonacoEditor = ({
@@ -38,23 +40,30 @@ const MonacoEditor = ({
   editorRef,
   monacoRef,
   autoFocus = true,
+  placeholder = '',
   className,
   executeQuery,
   onHasSelection,
   onPrompt,
+  onMount,
 }: MonacoEditorProps) => {
   const router = useRouter()
   const { profile } = useProfile()
   const { ref, content } = useParams()
-  const project = useSelectedProject()
-  const snapV2 = useSqlEditorV2StateSnapshot()
+  const { data: project } = useSelectedProjectQuery()
 
-  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const snapV2 = useSqlEditorV2StateSnapshot()
+  const tabsSnap = useTabsStateSnapshot()
+  const aiSnap = useAiAssistantStateSnapshot()
 
   const [intellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
     true
   )
+
+  // [Joshen] Lodash debounce doesn't seem to be working here, so opting to use useDebounce
+  const [value, setValue] = useState('')
+  const debouncedValue = useDebounce(value, 1000)
 
   const snippet = snapV2.snippets[id]
   const disableEdit =
@@ -84,6 +93,17 @@ const MonacoEditor = ({
     })
 
     editor.addAction({
+      id: 'save-query',
+      label: 'Save Query',
+      keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyS],
+      contextMenuGroupId: 'operation',
+      contextMenuOrder: 0,
+      run: () => {
+        if (snippet) snapV2.addNeedsSaving(snippet.snippet.id)
+      },
+    })
+
+    editor.addAction({
       id: 'explain-code',
       label: 'Explain Code',
       contextMenuGroupId: 'operation',
@@ -92,7 +112,8 @@ const MonacoEditor = ({
         const selectedValue = (editorRef?.current as any)
           .getModel()
           .getValueInRange((editorRef?.current as any)?.getSelection())
-        setAiAssistantPanel({
+        aiSnap.newChat({
+          name: 'Explain code section',
           open: true,
           sqlSnippets: [selectedValue],
           initialInput: 'Can you explain this section to me in more detail?',
@@ -141,32 +162,35 @@ const MonacoEditor = ({
       if (editor.getValue().length === 1) editor.setPosition({ lineNumber: 1, column: 2 })
       editor.focus()
     }
+
+    onMount?.(editor)
   }
 
-  const debouncedSetSql = debounce((id, value) => snapV2.setSql(id, value), 1000)
-
   function handleEditorChange(value: string | undefined) {
-    const snippetCheck = snapV2.snippets[id]
-
+    tabsSnap.makeActiveTabPermanent()
     if (id && value) {
-      if (snippetCheck) {
-        debouncedSetSql(id, value)
-      } else {
-        if (ref && profile !== undefined && project !== undefined) {
-          const snippet = createSqlSnippetSkeletonV2({
-            id,
-            name: untitledSnippetTitle,
-            sql: value,
-            owner_id: profile?.id,
-            project_id: project?.id,
-          })
-          snapV2.addSnippet({ projectRef: ref, snippet })
-          snapV2.addNeedsSaving(snippet.id)
-          router.push(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
-        }
+      if (!!snippet) {
+        setValue(value)
+      } else if (ref && !!profile && !!project) {
+        const snippet = createSqlSnippetSkeletonV2({
+          id,
+          name: untitledSnippetTitle,
+          sql: value,
+          owner_id: profile?.id,
+          project_id: project?.id,
+        })
+        snapV2.addSnippet({ projectRef: ref, snippet })
+        router.push(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
       }
     }
   }
+
+  useEffect(() => {
+    if (debouncedValue.length > 0 && snippet) {
+      snapV2.setSql(id, value)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedValue])
 
   // if an SQL query is passed by the content parameter, set the editor value to its content. This
   // is usually used for sending the user to SQL editor from other pages with SQL.
@@ -181,7 +205,7 @@ const MonacoEditor = ({
           type="default"
           className="m-0 py-2 rounded-none border-0 border-b [&>h5]:mb-0.5"
           title="This snippet has been shared to the project and is only editable by the owner who created this snippet"
-          description='You may duplicate this snippet into a personal copy by right clicking on the snippet and selecting "Duplicate personal copy"'
+          description='You may duplicate this snippet into a personal copy by right clicking on the snippet and selecting "Duplicate query"'
         />
       )}
       <Editor
@@ -195,6 +219,7 @@ const MonacoEditor = ({
         options={{
           tabSize: 2,
           fontSize: 13,
+          placeholder,
           lineDecorationsWidth: 0,
           readOnly: disableEdit,
           minimap: { enabled: false },

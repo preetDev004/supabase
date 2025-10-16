@@ -10,7 +10,7 @@ import Panel from 'components/ui/Panel'
 import { useDeleteLogDrainMutation } from 'data/log-drains/delete-log-drain-mutation'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   Button,
   DropdownMenu,
@@ -27,7 +27,6 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
-import { useFlag } from 'hooks/ui/useFlag'
 
 export function LogDrains({
   onNewDrainClick,
@@ -36,11 +35,10 @@ export function LogDrains({
   onNewDrainClick: (src: LogDrainType) => void
   onUpdateDrainClick: (drain: LogDrainData) => void
 }) {
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
 
   const { isLoading: orgPlanLoading, plan } = useCurrentOrgPlan()
   const logDrainsEnabled = !orgPlanLoading && (plan?.id === 'team' || plan?.id === 'enterprise')
-  const lokiLogDrainsEnabled = useFlag('lokilogdrains')
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedLogDrain, setSelectedLogDrain] = useState<LogDrainData | null>(null)
@@ -93,19 +91,17 @@ export function LogDrains({
   if (!isLoading && logDrains?.length === 0) {
     return (
       <div className="grid lg:grid-cols-2 gap-3">
-        {LOG_DRAIN_TYPES.map((src) =>
-          src.value === 'loki' && !lokiLogDrainsEnabled ? null : (
-            <CardButton
-              key={src.value}
-              title={src.name}
-              description={src.description}
-              icon={src.icon}
-              onClick={() => {
-                onNewDrainClick(src.value)
-              }}
-            />
-          )
-        )}
+        {LOG_DRAIN_TYPES.map((src) => (
+          <CardButton
+            key={src.value}
+            title={src.name}
+            description={src.description}
+            icon={src.icon}
+            onClick={() => {
+              onNewDrainClick(src.value)
+            }}
+          />
+        ))}
       </div>
     )
   }

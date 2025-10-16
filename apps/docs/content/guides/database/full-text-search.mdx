@@ -30,7 +30,7 @@ For this guide we'll use the following example data:
 >
 <TabPanel id="data" label="Data">
 
-{/* <!-- vale off --> */}
+{/* supa-mdx-lint-disable Rule003Spelling */}
 
 | id  | title                               | author                 | description                                                        |
 | --- | ----------------------------------- | ---------------------- | ------------------------------------------------------------------ |
@@ -40,7 +40,7 @@ For this guide we'll use the following example data:
 | 4   | Green Eggs and Ham                  | Dr. Seuss              | Sam has changing food preferences and eats unusually colored food. |
 | 5   | Harry Potter and the Goblet of Fire | J.K. Rowling           | Fourth year of school starts, big drama ensues.                    |
 
-{/* <!-- vale on --> */}
+{/* supa-mdx-lint-enable Rule003Spelling */}
 
 </TabPanel>
 <TabPanel id="sql" label="SQL">
@@ -129,6 +129,7 @@ const { data, error } = await supabase.from('books').select().eq('title', 'Harry
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -139,6 +140,8 @@ final result = await client
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -149,6 +152,8 @@ let response = try await supabase.from("books")
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -160,6 +165,8 @@ val data = supabase.from("books").select {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -167,6 +174,7 @@ data = supabase.from_('books').select().eq('title', 'Harry').execute()
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 The equality symbol above (`=`) is very "strict" on what it matches. In a full text search context, we might want to find all "Harry Potter" books and so we can rewrite the
@@ -195,6 +203,7 @@ const { data, error } = await supabase.from('books').select().textSearch('title'
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -205,6 +214,8 @@ final result = await client
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -214,6 +225,8 @@ let response = try await supabase.from("books")
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -225,6 +238,7 @@ val data = supabase.from("books").select {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Basic full text queries
@@ -260,6 +274,7 @@ const { data, error } = await supabase.from('books').select().textSearch('descri
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -270,6 +285,8 @@ final result = await client
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -280,6 +297,8 @@ let response = await client.from("books")
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -291,6 +310,8 @@ val data = supabase.from("books").select {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -298,17 +319,18 @@ data = supabase.from_('books').select().text_search('description', "'big'").exec
 ```
 
 </TabPanel>
+</$Show>
 
 <TabPanel id="data" label="Data">
 
-{/* <!-- vale off --> */}
+{/* supa-mdx-lint-disable Rule003Spelling */}
 
 | id  | title                               | author            | description                                     |
 | --- | ----------------------------------- | ----------------- | ----------------------------------------------- |
 | 3   | Tootle                              | Gertrude Crampton | Little toy train has big dreams.                |
 | 5   | Harry Potter and the Goblet of Fire | J.K. Rowling      | Fourth year of school starts, big drama ensues. |
 
-{/* <!-- vale on --> */}
+{/* supa-mdx-lint-enable Rule003Spelling */}
 
 </TabPanel>
 </Tabs>
@@ -355,6 +377,7 @@ const { data, error } = await supabase
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```sql
@@ -371,6 +394,8 @@ final result = await client
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```sql
@@ -388,6 +413,8 @@ let response = try await client
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```sql
@@ -405,6 +432,8 @@ val data = supabase.from("books").select {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```sql
@@ -418,16 +447,17 @@ data = supabase.from_('books').select().text_search('title_description', "little
 ```
 
 </TabPanel>
+</$Show>
 <TabPanel id="data" label="Data">
 
-{/* <!-- vale off --> */}
+{/* supa-mdx-lint-disable Rule003Spelling */}
 
 | id  | title                 | author                 | description                                 |
 | --- | --------------------- | ---------------------- | ------------------------------------------- |
 | 1   | The Poky Little Puppy | Janette Sebring Lowrey | Puppy is slower than other, bigger animals. |
 | 3   | Tootle                | Gertrude Crampton      | Little toy train has big dreams.            |
 
-{/* <!-- vale on --> */}
+{/* supa-mdx-lint-enable Rule003Spelling */}
 
 </TabPanel>
 </Tabs>
@@ -466,6 +496,7 @@ const { data, error } = await supabase
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -476,6 +507,8 @@ final result = await client
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -487,6 +520,8 @@ let response = try await client
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -498,6 +533,8 @@ val data = supabase.from("books").select {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -505,15 +542,16 @@ data = supabase.from_('books').select().text_search('description', "'little' & '
 ```
 
 </TabPanel>
+</$Show>
 <TabPanel id="data" label="Data">
 
-{/* <!-- vale off --> */}
+{/* supa-mdx-lint-disable Rule003Spelling */}
 
 | id  | title  | author            | description                      |
 | --- | ------ | ----------------- | -------------------------------- |
 | 3   | Tootle | Gertrude Crampton | Little toy train has big dreams. |
 
-{/* <!-- vale on --> */}
+{/* supa-mdx-lint-enable Rule003Spelling */}
 
 </TabPanel>
 </Tabs>
@@ -552,6 +590,7 @@ const { data, error } = await supabase
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -562,6 +601,8 @@ final result = await client
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -573,6 +614,8 @@ let response = try await client
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -584,6 +627,8 @@ val data = supabase.from("books").select {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -591,16 +636,17 @@ response = client.from_('books').select().text_search('description', "'little' |
 ```
 
 </TabPanel>
+</$Show>
 <TabPanel id="data" label="Data">
 
-{/* <!-- vale off --> */}
+{/* supa-mdx-lint-disable Rule003Spelling */}
 
 | id  | title                 | author                 | description                                 |
 | --- | --------------------- | ---------------------- | ------------------------------------------- |
 | 1   | The Poky Little Puppy | Janette Sebring Lowrey | Puppy is slower than other, bigger animals. |
 | 3   | Tootle                | Gertrude Crampton      | Little toy train has big dreams.            |
 
-{/* <!-- vale on --> */}
+{/* supa-mdx-lint-enable Rule003Spelling */}
 
 </TabPanel>
 </Tabs>
@@ -652,6 +698,7 @@ const { data, error } = await supabase.rpc('search_books_by_title_prefix', { pre
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -659,6 +706,8 @@ final data = await supabase.rpc('search_books_by_title_prefix', params: { 'prefi
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -670,6 +719,8 @@ let response = try await supabase.rpc(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -678,6 +729,8 @@ val result = supabase.postgrest.rpc("search_books_by_title_prefix", rpcParams)
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -685,6 +738,7 @@ data = client.rpc('search_books_by_title_prefix', { 'prefix': 'Lit' }).execute()
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 This function takes a prefix parameter and returns all books where the title contains a word starting with that prefix. The `:*` operator is used to denote a prefix match in the `to_tsquery()` function.
@@ -699,7 +753,7 @@ select * from search_books_by_title_prefix('Little+Puppy');
 
 ## Creating indexes
 
-Now that we have Full Text Search working, let's create an `index`. This will allow Postgres to "build" the documents pre-emptively so that they
+Now that we have Full Text Search working, let's create an `index`. This will allow Postgres to "build" the documents preemptively so that they
 don't need to be created at the time we execute the query. This will make our queries much faster.
 
 ### Searchable columns
@@ -734,8 +788,7 @@ from books;
 </TabPanel>
 <TabPanel id="data" label="Data">
 
-{/* <!-- vale off --> */}
-
+```
 | id  | fts                                                                                                             |
 | --- | --------------------------------------------------------------------------------------------------------------- |
 | 1   | 'anim':7 'bigger':6 'littl':10 'poki':9 'puppi':1,11 'slower':3                                                 |
@@ -743,8 +796,7 @@ from books;
 | 3   | 'big':5 'dream':6 'littl':1 'tootl':7 'toy':2 'train':3                                                         |
 | 4   | 'chang':3 'color':9 'eat':7 'egg':12 'food':4,10 'green':11 'ham':14 'prefer':5 'sam':1 'unus':8                |
 | 5   | 'big':6 'drama':7 'ensu':8 'fire':15 'fourth':1 'goblet':13 'harri':9 'potter':10 'school':4 'start':5 'year':2 |
-
-{/* <!-- vale on --> */}
+```
 
 </TabPanel>
 </Tabs>
@@ -779,6 +831,7 @@ const { data, error } = await supabase.from('books').select().textSearch('fts', 
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -789,6 +842,8 @@ final result = await client
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -800,6 +855,8 @@ let response = try await client
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -811,6 +868,8 @@ val data = supabase.from("books").select {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -818,22 +877,23 @@ data = client.from_('books').select().text_search('fts', "'little' & 'big'").exe
 ```
 
 </TabPanel>
+</$Show>
 <TabPanel id="data" label="Data">
 
-{/* <!-- vale off --> */}
+{/* supa-mdx-lint-disable Rule003Spelling */}
 
 | id  | title  | author            | description                      | fts                                                     |
 | --- | ------ | ----------------- | -------------------------------- | ------------------------------------------------------- |
 | 3   | Tootle | Gertrude Crampton | Little toy train has big dreams. | 'big':5 'dream':6 'littl':1 'tootl':7 'toy':2 'train':3 |
 
-{/* <!-- vale on --> */}
+{/* supa-mdx-lint-enable Rule003Spelling */}
 
 </TabPanel>
 </Tabs>
 
 ## Query operators
 
-Visit [PostgreSQL: Text Search Functions and Operators](https://www.postgresql.org/docs/current/functions-textsearch.html)
+Visit [Postgres: Text Search Functions and Operators](https://www.postgresql.org/docs/current/functions-textsearch.html)
 to learn about additional query operators you can use to do more advanced `full text queries`, such as:
 
 ### Proximity: `<->` [#proximity]
@@ -870,6 +930,7 @@ const { data, error } = await supabase
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -880,6 +941,8 @@ final result = await client
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -891,6 +954,8 @@ let response = try await client
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -902,6 +967,8 @@ val data = supabase.from("books").select {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -909,6 +976,7 @@ data = client.from_('books').select().text_search('description', "'big' <-> 'dre
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 We can also use the `<->` to find words within a certain distance of each other. For example to find `year` and `school` within 2 words of each other:
@@ -942,6 +1010,7 @@ const { data, error } = await supabase
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -952,6 +1021,8 @@ final result = await client
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -963,6 +1034,8 @@ let response = try await supabase
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -974,6 +1047,8 @@ val data = supabase.from("books").select {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -981,6 +1056,7 @@ data = client.from_('books').select().text_search('description', "'year' <2> 'sc
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ### Negation: `!` [#negation]
@@ -1017,6 +1093,7 @@ const { data, error } = await supabase
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -1027,6 +1104,8 @@ final result = await client
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -1038,6 +1117,8 @@ let response = try await client
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -1049,6 +1130,8 @@ val data = supabase.from("books").select {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -1056,8 +1139,9 @@ data = client.from_('books').select().text_search('description', "'big' & !'litt
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Resources
 
-- [PostgreSQL: Text Search Functions and Operators](https://www.postgresql.org/docs/12/functions-textsearch.html)
+- [Postgres: Text Search Functions and Operators](https://www.postgresql.org/docs/12/functions-textsearch.html)

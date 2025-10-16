@@ -1,6 +1,8 @@
-import { AlertTitle } from '@ui/components/shadcn/ui/alert'
 import { AlertCircle } from 'lucide-react'
 import Link from 'next/link'
+
+import { AlertTitle } from '@ui/components/shadcn/ui/alert'
+import { DOCS_URL } from 'lib/constants'
 import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
 interface CPUWarningsProps {
@@ -22,7 +24,7 @@ const CPUWarnings = ({ isFreePlan, upgradeUrl, severity }: CPUWarningsProps) => 
         </AlertDescription_Shadcn_>
         <div className="mt-3 flex items-center space-x-2">
           <Button asChild type="default">
-            <Link href="https://supabase.com/docs/guides/platform/exhaust-cpu">Learn more</Link>
+            <Link href={`${DOCS_URL}/guides/troubleshooting/high-cpu-usage`}>Learn more</Link>
           </Button>
           <Button asChild type="warning">
             <Link href={upgradeUrl}>
@@ -46,7 +48,7 @@ const CPUWarnings = ({ isFreePlan, upgradeUrl, severity }: CPUWarningsProps) => 
         </AlertDescription_Shadcn_>
         <div className="mt-3 flex items-center space-x-2">
           <Button asChild type="default">
-            <Link href="https://supabase.com/docs/guides/platform/exhaust-cpu">Learn more</Link>
+            <Link href={`${DOCS_URL}/guides/troubleshooting/high-cpu-usage`}>Learn more</Link>
           </Button>
           <Button asChild type="danger">
             <Link href={upgradeUrl}>
